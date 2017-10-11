@@ -95,19 +95,28 @@ public class LoginServlet extends HttpServlet {
         if (user.login(username, password) == true) {
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
-            request.setAttribute("username", username);
+            request.setAttribute("username", username);  
+            Cookie[] cookies = request.getCookies();
             
             if (remembered == null) {
+                for (Cookie c : cookies) {
+                    if (c.getName().equals(username)) {
+                        c.setMaxAge(0); 
+                        c.setPath("/");
+                        response.addCookie(c);
+                    }
+                }
                 response.sendRedirect("home");
-                
+                return;
             }
             
-            else if (remembered.equals("remembered")) {
+            else {
                 Cookie cookie = new Cookie("username", username);
                 cookie.setMaxAge(60 * 60 * 24 * 365); 
                 cookie.setPath("/");
                 response.addCookie(cookie);
                 response.sendRedirect("home");
+                return;
             }
             
             
